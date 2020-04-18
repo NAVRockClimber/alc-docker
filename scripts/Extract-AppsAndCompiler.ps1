@@ -1,5 +1,6 @@
 New-Item -Path "C:\alc\depedencies" -ItemType Directory -Force
 New-Item -Path "C:\alc\compiler" -ItemType Directory -Force
+New-Item -Path "C:\alc\assemblies" -ItemType Directory -Force
 New-Item -Path "C:\Build" -ItemType Directory -Force
 
 $apps = Get-ChildItem -Path C:\Applications\ -Filter *.app -Recurse
