@@ -6,13 +6,14 @@ COPY Extract-AppsAndCompiler.ps1 C:/run/Extract-AppsAndCompiler.ps1
 RUN Powershell -Command C:\run\Extract-AppsAndCompiler.ps1
 
 # seems only the sdk image contains the powershell
-# FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+# FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1909
 FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-1909
 ENV errorlog=c:\\logs\\error.log \
     loglevel=Normal \
     readonlyerrorsaswarnings=false \
     assemblyprobingpaths=C:\\alc\\assemblies \ 
     project=c:\\project \
+    appfolder='' \
     out=c:\\artifact \
     packagecachepath=C:\\alc\\depedencies
 COPY --from=builder ["C:/alc", "C:/alc/"] 
