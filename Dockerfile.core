@@ -1,0 +1,32 @@
+ARG BASE
+FROM mcr.microsoft.com/windows/servercore:$BASE as mother
+ARG NCHVERSION
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+
+RUN Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force; \
+    Install-Module navcontainerhelper -MinimumVersion $env:NCHVERSION -MaximumVersion $env:NCHVERSION -Force;
+
+ARG TYPE
+ARG COUNTRY
+ARG VERSION
+
+RUN Import-Module navcontainerhelper; \
+    Download-Artifacts -artifactUrl (Get-BCArtifactUrl -type $env:TYPE -country $env:COUNTRY -version $env:VERSION) -includePlatform;
+
+RUN New-Item -Path c:\artifacts -ItemType Directory; \
+    New-Item -Path c:\bin -ItemType Directory; \
+    Copy-Item "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\platform\ModernDev\program` files\Microsoft` Dynamics` NAV\*\AL` Development` Environment\ALLanguage.vsix" "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\ALLanguage.zip"; \
+    Copy-Item "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\platform\ModernDev\program` files\Microsoft` Dynamics` NAV\*\AL` Development` Environment\System.app" "C:\artifacts\System.app"; \
+    Copy-Item "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\$env:COUNTRY\Applications.de" "C:\artifacts"; \
+    Expand-Archive "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\ALLanguage.zip" "C:\alc"; 
+
+
+# seems only the sdk image contains the powershell
+FROM mcr.microsoft.com/windows/servercore:$BASE
+ARG TYPE
+ARG COUNTRY
+ARG VERSION
+COPY --from=mother c:/alc/extension/bin c:/bin
+COPY --from=mother C:/artifacts C:/artifacts
+
+CMD c:\bin\win32\alc.exe /project:c:\src /packagecachepath:c:\symbols /out:c:\src\app.app
