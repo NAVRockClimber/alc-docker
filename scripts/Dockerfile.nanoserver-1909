@@ -7,16 +7,16 @@ RUN Powershell -Command C:\run\Extract-AppsAndCompiler.ps1
 
 # seems only the sdk image contains the powershell
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1909
+COPY --from=builder ["C:/alc", "C:/alc/"] 
 ENV errorlog=c:\\logs\\error.log \
     loglevel=Normal \
     readonlyerrorsaswarnings=false \
     assemblyprobingpaths=C:\\alc\\assemblies \ 
     project=c:\\project \
-    appfolder='' \
+    appfolder=' ' \
     out=c:\\artifact \
     packagecachepath=C:\\alc\\depedencies \
-    rulesetfile=''
-COPY --from=builder ["C:/alc", "C:/alc/"] 
+    rulesetfile=' '
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 RUN New-Item -Path "c:\project" -ItemType Directory -Force | Out-Null; \
     New-Item -Path "c:\artifact" -ItemType Directory -Force | Out-Null; \

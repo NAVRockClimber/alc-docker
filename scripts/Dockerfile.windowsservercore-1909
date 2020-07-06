@@ -6,16 +6,16 @@ COPY Extract-AppsAndCompiler.ps1 C:/run/Extract-AppsAndCompiler.ps1
 RUN Powershell -Command C:\run\Extract-AppsAndCompiler.ps1
 
 FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-1909
+COPY --from=builder ["C:/alc", "C:/alc/"] 
 ENV errorlog=c:\\logs\\error.log \
     loglevel=Normal \
     readonlyerrorsaswarnings=false \
     assemblyprobingpaths=C:\\alc\\assemblies \ 
     project=c:\\project \
-    appfolder='' \
+    appfolder=' ' \
     out=c:\\artifact \
     packagecachepath=C:\\alc\\depedencies \
-    rulesetfile=''
-COPY --from=builder ["C:/alc", "C:/alc/"] 
+    rulesetfile=' '
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 RUN New-Item -Path "c:\project" -ItemType Directory -Force | Out-Null; \
     New-Item -Path "c:\artifact" -ItemType Directory -Force | Out-Null; \
