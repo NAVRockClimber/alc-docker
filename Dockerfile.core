@@ -26,7 +26,6 @@ RUN New-Item -Path c:\artifacts -ItemType Directory; `
     Copy-Item "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\platform\ServiceTier\program` files\Microsoft` Dynamics` NAV\160\Service" "C:\assemblies\Service" -Recurse; `
     Copy-Item "C:\bcartifacts.cache\$env:TYPE\$env:VERSION\platform\Test` Assemblies\Mock` Assemblies" "C:\assemblies\MockAssemblies" -Recurse; 
 
-# seems only the sdk image contains the powershell
 FROM mcr.microsoft.com/windows/servercore:$BASE
 ARG TYPE
 ARG COUNTRY
@@ -35,9 +34,15 @@ COPY --from=mother c:/alc/extension/bin c:/bin
 COPY --from=mother C:/artifacts C:/symbols
 COPY --from=mother C:/assemblies c:/assemblies
 
-# /analyzer:$(Join-Path $binPath 'Analyzers\Microsoft.Dynamics.Nav.CodeCop.dll')
-# /analyzer:$(Join-Path $binPath 'Analyzers\Microsoft.Dynamics.Nav.AppSourceCop.dll')
-# /analyzer:$(Join-Path $binPath 'Analyzers\Microsoft.Dynamics.Nav.UICop.dll')
 # /ruleset:$rulesetfile
-# /assemblyprobingpaths
-CMD c:\bin\win32\alc.exe /project:c:\src /packagecachepath:c:\symbols /out:c:\src\app.app /assemblyprobingpaths:"c:\assemblies\OpenXMLSdk","C:\src\.netpackages","C:\assemblies\RoleTailoredClient","C:\assemblies\Service","C:\assemblies\MockAssemblies","c:\windows\assembly"
+ENV rulesetfile=''
+CMD c:\bin\win32\alc.exe `
+    /project:c:\src `
+    /packagecachepath:c:\symbols `
+    /out:c:\src\app.app `
+    /errorlog:c:\src\alc.log `
+    /ruleset:%rulesetfile% `
+    /analyzer:c:\bin\Analyzers\Microsoft.Dynamics.Nav.CodeCop.dll `
+    /analyzer:c:\bin\Analyzers\Microsoft.Dynamics.Nav.AppSourceCop.dll `
+    /analyzer:c:\bin\Analyzers\Microsoft.Dynamics.Nav.UICop.dll `
+    /assemblyprobingpaths:"c:\assemblies\OpenXMLSdk","C:\src\.netpackages","C:\assemblies\RoleTailoredClient","C:\assemblies\Service","C:\assemblies\MockAssemblies","c:\windows\assembly"
