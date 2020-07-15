@@ -20,3 +20,7 @@ docker build -t <imagename>:<tag> --build-arg BASE=<sac tag> --build-arg NCHVERS
 ```
 docker run -v <App Folder Host>:C:\src -v -e RulesetFile="c:\src\Cop.ruleset.json" --memory 10G --name alcnano --rm alc:<tag>
 ```
+
+# Choosing the right image
+
+If you don't have any dotnet declarations you should be able to use the much smaller Nanoserver Image. Elsewise you got to choose the servercore image due to it contains the .Net framework.
