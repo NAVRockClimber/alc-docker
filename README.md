@@ -24,3 +24,7 @@ docker run -v <App Folder Host>:C:\src -v -e RulesetFile="c:\src\Cop.ruleset.jso
 # Choosing the right image
 
 If you don't have any dotnet declarations you should be able to use the much smaller Nanoserver Image. Elsewise you got to choose the servercore image due to it contains the .Net framework.
+
+# Converting the output for DevOps
+
+For usage with DevOps you can use the [Convert-ALC-Output.ps1](https://raw.githubusercontent.com/NAVRockClimber/convert-alc-output/dev/Convert-ALC-Output.ps1). Just pass the log into the script.
