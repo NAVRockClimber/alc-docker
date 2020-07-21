@@ -1,20 +1,36 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+Dockerfiles for creating an ALC compiler image with all default dependencies from Microsoft. Special conisideration was to limit the number of environment variables to an absolute minimum. If additional parameters and / or dependencies are needed you should override the default docker CMD in your RUN command.
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+# Build the image
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+For building the image you need to specify certain build arguments:
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- BASE: The base tag for the release channel of your architecture e.g.: 1709, 1803, 1909
+- NCHVERSION: The version of Freddy's navcontainerhelper. Only used in the intermediate image for pulling and extracting the artifacts.
+- TYPE, COUNTRY, VERSION: These arguments are passed into Freddy Scripts. See the possible values in Freddy description of Get-BCArtifactUrl.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+The image itself is build by the following:`
+
+```
+docker build -t <imagename>:<tag> --build-arg BASE=<sac tag> --build-arg NCHVERSION=<Version> --build-arg TYPE=<OnPrem/Sandbox> --build-arg COUNTRY=<de> --build-arg VERSION=<16.2.13509.13779> -f .\Dockerfile.nano .
+```
+
+# Run the container
+
+The most simple variant for running the compiler would be:
+```
+docker run -v <App Folder Host>:C:\src -v -e RulesetFile="c:\src\Cop.ruleset.json" --name alcnano --rm alc:<tag>
+```
+
+If the compile process takes a long time you can try to improve it with granting more memory to the container. This reduced the compile time of about 7000 AL files from over 30 minutes to 3 minutes.
+```
+docker run -v <App Folder Host>:C:\src -v -e RulesetFile="c:\src\Cop.ruleset.json" --memory 10G --name alcnano --rm alc:<tag>
+```
+
+# Choosing the right image
+
+If you don't have any dotnet declarations you should be able to use the much smaller Nanoserver Image. Elsewise you got to choose the servercore image due to it contains the .Net framework.
+
+# Converting the output for DevOps
+
+For usage with DevOps you can use the [Convert-ALC-Output.ps1](https://raw.githubusercontent.com/NAVRockClimber/convert-alc-output/dev/Convert-ALC-Output.ps1). Just pass the log into the script.
